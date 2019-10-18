@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module sbt.imports="_root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, sbt._, Keys._, dsl._" sbt.resolvers="file:/C:/Users/Lorenzo%20Boccolini/.sbt/preloaded/|maven|local-preloaded, C:\Users\Lorenzo Boccolini\.ivy2\cache|ivy|Local cache, https://repo1.maven.org/maven2/|maven|public" type="SBT_MODULE" version="4">
+  <component name="SbtModule">
+    <option name="buildForURI" value="file:/C:/Users/Lorenzo%20Boccolini/IdeaProjects/GeoElaborator/" />
+    <option name="imports" value="_root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, sbt._, Keys._, dsl._" />
+  </component>
+</module>

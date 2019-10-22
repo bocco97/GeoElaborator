@@ -3,7 +3,6 @@ import java.io.{BufferedReader, InputStreamReader}
 import java.net.URL
 import java.security.KeyStore
 import java.util.Properties
-
 import javax.net.ssl.{HttpsURLConnection, SSLContext, TrustManagerFactory}
 import kafka.serializer.StringDecoder
 import org.apache.kafka.clients.producer.{Callback, KafkaProducer, ProducerConfig, ProducerRecord, RecordMetadata}
@@ -12,13 +11,10 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.slf4j.LoggerFactory
 import sun.net.www.protocol.https.DefaultHostnameVerifier
-
 import scala.util.parsing.json._
-
 
 //spark-submit --master yarn --deploy-mode client --class "GeoElaborator" GeoElaborator-1.0-SNAPSHOT.jar
 //spark-submit --master yarn --deploy-mode cluster --class it.unipi.meteorites.GeoElaborator GeoElaborator-1.0-SNAPSHOT.jar
-//{"osm_type":"way","osm_id":667034130,"lat":"46.7634391","lon":"-70.1199366","display_name":"14, Sainte-Lucie-de-Beauregard, Montmagny (MRC), Chaudière-Appalaches, Québec, Canada","address":{"path":"14","village":"Sainte-Lucie-de-Beauregard","county":"Montmagny (MRC)","region":"Chaudière-Appalaches","state":"Québec","country":"Canada","country_code":"ca"},"boundingbox":["46.7570163","46.7723947","-70.1254374","-70.0932999"]}
 object GeoElaborator {
 
   val log = LoggerFactory.getLogger(GeoElaborator.getClass.getName)
@@ -27,6 +23,19 @@ object GeoElaborator {
     val obj = JSON.parseFull(s)
     val map = obj.get.asInstanceOf[Map[String, String]]
     map
+  }
+
+  def normalize(country: String, state: String):String={
+    var res = country
+    country match{
+      case "PRC"=> res = "China"
+      case "USA" => res = "United States of America"
+      case "Congo-Brazzaville" => res = "Congo"
+      case "DR Congo" => res = "Congo"
+      case "" => res = state
+      case _ => res = country
+    }
+    res
   }
 
   def restCall(lat:String,lon:String,url_0:String,url_1:String):String={
@@ -91,6 +100,7 @@ object GeoElaborator {
       catch{
         case _ : Throwable => ()
       }
+      country= normalize(country,state)
       val name = response.get("display_name").get.replace(',','-')
       val additionalInfo = AdditionalInfo(name,state,country)
       val year = evt.get("year").get
@@ -123,7 +133,6 @@ object GeoElaborator {
     val url_0 = "https://nominatim.openstreetmap.org/reverse?format=json&"
     val url_1 = "&zoom=5&addressdetails=1&accept-language=<en>"
     val prop = new Properties()
-    //val f = new FileOutputStream("out.txt")
     prop.load(this.getClass().getResourceAsStream("/config.properties"))
     localRun = prop.getProperty("LOCAL_RUN")
     bootstrap_server = prop.getProperty("BOOTSTRAP_SERVER")
@@ -156,7 +165,7 @@ object GeoElaborator {
           prod.send(record, new Callback(){
             override def onCompletion(recordMetadata: RecordMetadata, e: Exception): Unit = {
               if(e==null){
-                println("\n**sent: "+met2js+"**\n")
+                log.info("\n\n**sent: "+met2js+"**\n")
               }
               else{
                 log.warn("Error sending meteorite data to Kafka")
@@ -165,8 +174,8 @@ object GeoElaborator {
           })
         }
         catch{
-          case x:java.lang.UnsupportedOperationException =>{
-            println("Nothing to elaborate. Waiting . . .")
+          case _:java.lang.UnsupportedOperationException =>{
+            log.info("Nothing to elaborate. Waiting . . .")
           }
         }
       })

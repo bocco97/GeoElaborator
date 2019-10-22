@@ -98,6 +98,7 @@
     <configuration name="GeoElaborator" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="ALTERNATIVE_JRE_PATH" value="1.7" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
       <option name="MAIN_CLASS_NAME" value="it.unipi.meteorites.GeoElaborator" />
       <module name="geoelaborator" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/main/scala/it/unipi/meteorites" />

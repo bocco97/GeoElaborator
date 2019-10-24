@@ -13,4 +13,21 @@ object Meteorite{
     val str = write(m)
     str
   }
+  def getFields(): List[String]={
+    List[String]("mass","lat","lon","recclass","resolved","info")
+  }
+  def get(m:Meteorite,f:String): String ={
+    f match {
+      case "mass" => m.mass
+      case "lat" => m.lat
+      case "lon" => m.lon
+      case "recclass" => m.recclass
+      case "resolved" => m.resolved.toString
+      case "info" => {
+        if (m.resolved) m.info.toString
+        else "null"
+      }
+      case _ => ""
+    }
+  }
 }

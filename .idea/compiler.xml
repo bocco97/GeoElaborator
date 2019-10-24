@@ -10,8 +10,5 @@
         <module name="GeoElaborator" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="GeoElaborator" target="1.5" />
-    </bytecodeTargetLevel>
   </component>
 </project>

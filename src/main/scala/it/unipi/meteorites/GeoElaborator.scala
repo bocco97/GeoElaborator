@@ -116,10 +116,10 @@ object GeoElaborator {
     new KafkaProducer[String,String](properties)
   }
 
-  def write2Hbase(table_name:String, col_fam:String, meteorite:Meteorite):Unit={
+  def write2Hbase(table_name:String, col_fam:String, meteorite:Meteorite,zq:String,port:String):Unit={
     val config = HBaseConfiguration.create()
-    config.set("hbase.zookeeper.quorum","hadoop-a03.tainet,hadoop-a01.tainet,hadoop-a02.tainet")
-    config.set("hbase.zookeeper.property.clientPort","2181")
+    config.set("hbase.zookeeper.quorum",zq)
+    config.set("hbase.zookeeper.property.clientPort",port)
     val conn = ConnectionFactory.createConnection(config)
     val table = conn.getTable(TableName.valueOf(table_name))
     var put = new Put(Bytes.toBytes(meteorite.year+"_"+scala.util.Random.nextInt(scala.Int.MaxValue)))
@@ -152,6 +152,8 @@ object GeoElaborator {
     val REQ_TIMEOUT =  prop.getProperty("REST_REQ_TIMEOUT").toInt*1000
     val HBASE_TABLE = prop.getProperty("HBASE_TABLE")
     val COL_FAM = prop.getProperty("COLUMN_FAMILY")
+    val ZOOKEEPER_QUORUM = prop.getProperty("ZOOKEEPER_QUORUM")
+    val ZK_CLIENT_PORT = prop.getProperty("ZOOKEEPER_CLIENT_PORT")
     /******************************************************************************************************/
     val conf = if (LOCAL_RUN=="true") new SparkConf().setMaster("local[*]") else new SparkConf()
     val sc = new SparkContext(conf.setAppName("GeoElaborator"))
@@ -176,7 +178,7 @@ object GeoElaborator {
           val meteorite = elaborate(result, evt)
           val met2js = Meteorite.toJson(meteorite)
           val record = new ProducerRecord[String, String](WRITING_TOPIC, met2js)
-          write2Hbase(HBASE_TABLE, COL_FAM, meteorite)
+          write2Hbase(HBASE_TABLE, COL_FAM, meteorite,ZOOKEEPER_QUORUM,ZK_CLIENT_PORT)
           prod.send(record, new Callback() {
             override def onCompletion(recordMetadata: RecordMetadata, e: Exception): Unit = {
               e match {

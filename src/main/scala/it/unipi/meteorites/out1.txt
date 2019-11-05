@@ -1,4 +1,0 @@
-AdditionalInfo(Massa- Moyen-Chari شاري الأوسط- Tchad تشاد,Moyen-Chari شاري الأوسط,Tchad تشاد)
-AdditionalInfo(Sermersooq- Kalaallit Nunaat,,Kalaallit Nunaat)
-AdditionalInfo(сельское поселение Хатанга- Таймырский Долгано-Ненецкий район- Красноярский край- СФО- Россия,Красноярский край,Россия)
-AdditionalInfo(Strada Provinciale 165- Palizzi- RC- CAL- 89038- Italia,CAL,Italia)

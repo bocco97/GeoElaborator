@@ -79,8 +79,6 @@
             <version>1.2.0-${cdh.version}</version>
         </dependency>
 
-
-
     </dependencies>
 
     <build>

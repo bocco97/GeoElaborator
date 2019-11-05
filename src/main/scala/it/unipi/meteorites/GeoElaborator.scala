@@ -34,6 +34,7 @@ object GeoElaborator {
     country match{
       case "PRC"=> res = "China"
       case "USA" => res = "United States of America"
+      case "United States" => res = "United States of America"
       case "Congo-Brazzaville" => res = "Congo"
       case "DR Congo" => res = "Congo"
       case "Democratic Republic of the Congo" => res = "Congo"
@@ -58,7 +59,6 @@ object GeoElaborator {
     HttpsURLConnection.setDefaultHostnameVerifier(new DefaultHostnameVerifier)
     HttpsURLConnection.setDefaultSSLSocketFactory(sf)
 
-
     @tailrec
     def readRestResponse(buffer: BufferedReader, finalResult: String, currentLine: Option[String]): String = currentLine match {
       case  None => finalResult
@@ -69,6 +69,7 @@ object GeoElaborator {
       val urlconn = url.openConnection().asInstanceOf[HttpsURLConnection]
       urlconn.setRequestMethod("GET")
       urlconn.setConnectTimeout(timeout)
+      urlconn.setReadTimeout(timeout)
       urlconn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11")
       urlconn.setRequestProperty("Accept", "application/json;charset=UTF8")
       urlconn.connect()
@@ -166,7 +167,6 @@ object GeoElaborator {
     val topics = List(TOPIC).toSet
     val record = KafkaUtils.createDirectStream[String,String,StringDecoder,StringDecoder](ssc,kafkaParams,topics)
     val prod = createKafkaProducer(BOOTSTRAP_SERVER)
-
     val record1 = record.transform(rdd => rdd).map(_._2)
     record1.foreachRDD(x => {
         try {
@@ -177,7 +177,7 @@ object GeoElaborator {
           val result = restCall(lat, lon, url_0, url_1, REQ_TIMEOUT)
           val meteorite = elaborate(result, evt)
           val met2js = Meteorite.toJson(meteorite)
-          val record = new ProducerRecord[String, String](WRITING_TOPIC, met2js)
+          val record = new ProducerRecord[String, String](WRITING_TOPIC,met2js)
           write2Hbase(HBASE_TABLE, COL_FAM, meteorite,ZOOKEEPER_QUORUM,ZK_CLIENT_PORT)
           prod.send(record, new Callback() {
             override def onCompletion(recordMetadata: RecordMetadata, e: Exception): Unit = {
